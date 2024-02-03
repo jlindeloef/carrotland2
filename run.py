@@ -1,88 +1,152 @@
-import random
-class GameBoard:
-  def __init__(self, board):
-    self.board = board
-
-  def get_letters_to_numbers():
-    letters_to_numbers = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5, "G": 6, "H": 7}
-    return letters_to_numbers
-
-  def print_board(self):
-      print("  A B C D E F G H")
-      print("  +-+-+-+-+-+-+-+")
-      row_number = 1
-      for row in self.board:
-          print("%d|%s|" % (row_number, "|".join(row)))
-          row_number += 1
-class Battleship:
-  def __init__(self, board):
-    self.board = board
-
-  def create_ships(self):
-    for i in range(5):
-      self.x_row, self.y_column = random.randint(0, 7), random.randint(0, 7)
-      while self.board[self.x_row][self.y_column] == "X":
-        self.x_row, self.y_column = random.randint(0, 7), random.randint(0, 7)
-      self.board[self.x_row][self.y_column] = "X"
-    return self.board
-
-  def get_user_input(self):
-    try:
-      x_row = input("Enter the row of the ship: ")
-      while x_row not in '12345678':
-          print('Not an appropriate choice, please select a valid row')
-          x_row = input("Enter the row of the ship: ")
-
-      y_column = input("Enter the column letter of the ship: ").upper()
-      while y_column not in "ABCDEFGH":
-          print('Not an appropriate choice, please select a valid column')
-          y_column = input("Enter the column letter of the ship: ").upper()
-      return int(x_row) - 1, GameBoard.get_letters_to_numbers()[y_column]
-    except Exception:
-        print("An error occurred")
-      
+from random import randint
 
 
-  def count_hit_ships(self):
-    hit_ships = 0
-    for row in self.board:
-      for column in row:
-        if column == "X":
-          hit_ships += 1
-    return hit_ships
+class Board:
+    def __init__(self, board):
+        self.board = board
 
-def RunGame(): 
-  computer_board = GameBoard([[" "] * 8 for i in range(8)])
-  user_guess_board = GameBoard([[" "] * 8 for i in range(8)])
-  Battleship.create_ships(computer_board)
-  #start 10 turns
-  turns = 10
-  while turns > 0:
-    GameBoard.print_board(user_guess_board)
-    #get user input
-    user_x_row, user_y_column = Battleship.get_user_input(object)
-    #check if duplicate guess
-    while user_guess_board.board[user_x_row][user_y_column] == "-" or user_guess_board.board[user_x_row][user_y_column] == "X":
-      print("You guessed that one already")
-      user_x_row, user_y_column = Battleship.get_user_input(object)
-    #check for hit or miss
-    if computer_board.board[user_x_row][user_y_column] == "X":
-      print("You sunk 1 of my battleship!")
-      user_guess_board.board[user_x_row][user_y_column] = "X"
-    else:
-      print("You missed my battleship!")
-      user_guess_board.board[user_x_row][user_y_column] = "-"
-    #check for win or lose
-    if Battleship.count_hit_ships(user_guess_board) == 5:
-      print("You hit all 5 battleships!")
-      break
-    else:
-      turns -= 1
-      print(f"You have {turns} turns remaining")
-      if turns == 0:
-        print("Sorry you ran out of turns")
-        GameBoard.print_board(user_guess_board)
-        break
+    def letters_to_numbers(self):
+        """
+        Transform letters to numbers to our boardgame column.
+        """
+        letters_to_numbers = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4}
+        return letters_to_numbers
 
-if __name__ == '__main__':
-  RunGame()
+    def print_board(self):
+        """
+        Printing letters to the board.
+        Adding numbers as rows in our boardgame.
+        Creating and defying the inputs on the board.
+        Make our board start with number 1.
+        """
+        print("")
+        print("  A B C D E")
+        row_num = 1
+        for row in self.board:
+            print("%d|%s|" % (row_num, "|".join(row)))
+            row_num += 1
+
+
+class Carrots:
+    def __init__(self, board):
+        self.board = board
+
+    def create_carrots(self):
+        """
+        Random displacement of carrots on game board.
+        Give the carrot the mark of "X".
+        """
+        for _ in range(5):
+            carrot_row, carrot_column = randint(0, 4), randint(0, 4)
+            while self.board[carrot_row][carrot_column] == "X":
+                carrot_row, carrot_column = randint(0, 4), randint(0, 4)
+            self.board[carrot_row][carrot_column] = "X"
+
+    def get_user_input(self):
+        """
+        Get users inputs in the game and responding to the inputs.
+        """
+        try:
+            row = input("Look for carrot on row(1-5)...: \n")
+            while row not in '12345':
+                print("Not valid! Select a valid row(1-5).")
+                row = input("Try again, look for carrot on row(1-5)...: \n")
+
+            column = input("Choose a column(A-E): \n").upper()
+            while column not in "ABCDE":
+                print("Not valid! Select a valid column(A-E).")
+                column = input("Choose a column(A-E): \n").upper()
+            return int(row) - 1, \
+                Board.letters_to_numbers(self)[column]
+        except (ValueError, KeyError):
+            print("Not a valid input")
+            return self.get_user_input()
+
+    def find_carrots(self):
+        """
+        Tells what happens on the board when finding carrot.
+        """
+        find_carrots = 0
+        for row in self.board:
+            for column in row:
+                if column == "X":
+                    find_carrots += 1
+        return find_carrots
+
+
+def game_over():
+
+    """
+    End game or loose
+    """
+    user_input = input("Play again (Y/N)? \n").upper()
+    if user_input == "Y":
+        play_game()
+    if user_input == "N":
+        print("Thank you for playing!")
+        exit()
+
+
+def play_game():
+    """
+    Loops through the game.
+    """
+    print('''
+========================================================================
+                        Welcome to Carrotland!
+The rowdy rabbit has almost taken all of the carrots from the garden from
+underground. He left the leaves sticking up so you don't know if there is
+a carrot attached to it.
+There are 5 carrots left! Find them before the rowdy rabbit does!
+
+        X = Found a carrot!
+        - = Only leaves!
+                            Good Luck!
+======================================================================
+''')
+    """
+    Creating board for game
+    """
+    print("Find the carrots! You have 10 turns!\n")
+    game_board = Board([[" "] * 5 for i in range(5)])
+    guess_board = Board([[" "] * 5 for i in range(5)])
+    Carrots.create_carrots(game_board)
+    """
+    Tells turns and how many remains.
+    The users input and checks for same guess.
+    """
+    turns = 10
+    while turns > 0:
+        Board.print_board(guess_board)
+        print(f"You have {turns} turns remaining")
+        user_row, user_column = Carrots.get_user_input(object)
+        if guess_board.board[user_row][user_column] == "-"\
+                or guess_board.board[user_row][user_column] == "X":
+            print("You searched there already")
+            user_row, user_column = Carrots.get_user_input(object)
+            """
+            Checks for if user find/not find carrot.
+            """
+        if game_board.board[user_row][user_column] == "X":
+            print("YEAH! You found a carrot!")
+            guess_board.board[user_row][user_column] = "X"
+        else:
+            print("Sorry! No carrot!")
+            guess_board.board[user_row][user_column] = "-"
+            """
+            If user win or loose.
+            """
+        if Carrots.find_carrots(guess_board) == 5:
+            print("CONGRATULATION! You found all 5 carrots! Yum! carrotcake!")
+            game_over()
+        else:
+            turns -= 1
+            if turns == 0:
+                print("Sorry! The rabbit found the carrots before you did!")
+                print("Game Over")
+                game_over()
+
+
+if __name__ == "__main__":
+    play_game()
+
